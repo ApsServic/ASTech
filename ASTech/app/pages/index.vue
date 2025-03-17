@@ -1,5 +1,23 @@
 <script setup lang="ts">
-const { data: page } = await useAsyncData('index', () => queryContent('/').findOne())
+import { ref, defineComponent } from 'vue'
+import { useAsyncData, createError, useSeoMeta } from '#imports'
+
+interface Page {
+  title: string;
+  description: string;
+  hero: {
+    title: string;
+    description: string;
+    links: any[];
+    headline?: { label: string; to: string; icon?: string };
+  };
+  sections: Array<{ title: string; description: string; align: string; features: any[] }>;
+  features: { title: string; description: string; items: any[] };
+  testimonials: { headline: string; title: string; description: string; items: any[] };
+  cta: any;
+}
+
+const { data: page } = await useAsyncData<Page>('index', () => queryContent('/').findOne())
 if (!page.value) {
   throw createError({ statusCode: 404, statusMessage: 'Page not found', fatal: true })
 }
@@ -21,7 +39,7 @@ useSeoMeta({
       :links="page.hero.links"
     >
       <div class="absolute inset-0 landing-grid z-[-1] [mask-image:radial-gradient(100%_100%_at_top_right,white,transparent)]" />
-
+      
       <template #headline>
         <UBadge
           v-if="page.hero.headline"
@@ -40,9 +58,7 @@ useSeoMeta({
               aria-hidden="true"
             />
           </NuxtLink>
-
           {{ page.hero.headline.label }}
-
           <UIcon
             v-if="page.hero.headline.icon"
             :name="page.hero.headline.icon"
