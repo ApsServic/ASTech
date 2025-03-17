@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { ref } from 'vue'
+import { definePageMeta, useSeoMeta, createError } from '#imports'
+
 definePageMeta({
   layout: 'auth'
 })
@@ -7,7 +10,14 @@ useSeoMeta({
   title: 'Login'
 })
 
-const fields = [{
+interface Field {
+  name: string;
+  type: string;
+  label: string;
+  placeholder: string;
+}
+
+const fields: Field[] = [{
   name: 'email',
   type: 'email',
   label: 'Email',
@@ -19,7 +29,7 @@ const fields = [{
   placeholder: 'Enter your password'
 }]
 
-const validate = (state: any) => {
+const validate = (state: { email: string; password: string }) => {
   const errors = []
   if (!state.email) errors.push({ path: 'email', message: 'Email is required' })
   if (!state.password) errors.push({ path: 'password', message: 'Password is required' })
@@ -35,13 +45,17 @@ const providers = [{
   }
 }]
 
-function onSubmit(data: any) {
-  console.log('Submitted', data)
+const onSubmit = (data: { email: string; password: string }) => {
+  try {
+    console.log('Submitted', data)
+    // Add logic to handle form submission
+  } catch (error) {
+    console.error('Submission error:', error)
+    throw createError({ statusCode: 500, statusMessage: 'Submission failed, please try again later.' })
+  }
 }
 </script>
 
-<!-- eslint-disable vue/multiline-html-element-content-newline -->
-<!-- eslint-disable vue/singleline-html-element-content-newline -->
 <template>
   <UCard class="max-w-sm w-full bg-white/75 dark:bg-white/5 backdrop-blur">
     <UAuthForm
@@ -78,3 +92,24 @@ function onSubmit(data: any) {
     </UAuthForm>
   </UCard>
 </template>
+
+<style scoped>
+.max-w-sm {
+  max-width: 24rem;
+}
+.bg-white/75 {
+  background-color: rgba(255, 255, 255, 0.75);
+}
+.dark .bg-white/5 {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+.backdrop-blur {
+  backdrop-filter: blur(10px);
+}
+.text-primary {
+  color: var(--color-primary);
+}
+.font-medium {
+  font-weight: 500;
+}
+</style>
